@@ -1,0 +1,39 @@
+.navbar {
+    border-radius: 0 !important;
+    margin-bottom: 0;
+}
+.dropdown-menu .user-info {
+    text-align: center;
+    background-color: #e7e7e7;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    padding: 10px 0px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,.15);
+}
+.dropdown-menu .user-info img {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 10px auto;
+    border-radius: 100px;
+}
+.dropdown-menu>li>a.text-danger {
+	color: #a94442 !important;
+}
+.dropdown-menu span.glyphicon {
+	margin-right: 5px;
+}
+.page-header {
+    padding-bottom: 0;
+    margin: 0;
+}
+.breadcrumb {
+	border-radius: 0;
+}
+.w30 {
+	width: 30px !important;
+}
+.w50 {
+	width: 50px !important;
+}
