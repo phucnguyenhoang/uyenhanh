@@ -18,3 +18,5 @@ $lang['customer']				= 'Đối tác';
 $lang['name']					= 'Tên';
 $lang['spec']					= 'Quy cách';
 $lang['note']					= 'Ghi chú';
+$lang['product_empty']			= 'Chưa có sản phẩm nào';
+$lang['create_product']			= 'Tạo sản phẩm';
