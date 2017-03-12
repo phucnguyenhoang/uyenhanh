@@ -30,11 +30,18 @@
 }
 .breadcrumb {
 	border-radius: 0;
-	margin-bottom: 0;
 }
 .w30 {
 	width: 30px !important;
 }
 .w50 {
 	width: 50px !important;
+}
+.w80 {
+	width: 80px !important;
+}
+label.required::after {
+	content: "*";
+	color: #a94442;
+	margin-left: 3px;
 }

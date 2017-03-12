@@ -37,4 +37,11 @@ class Auth {
 
 		return false;
 	}
+
+	public function check($allow = array()) {
+		$currAction = $this->CI->uri->rsegment(2);
+		if (!empty($allow) && in_array($currAction, $allow['allowed'])) return true;
+
+		if (!$this->isLoggedIn()) redirect('/users/login');
+	}
 }

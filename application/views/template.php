@@ -80,19 +80,24 @@
     </nav>
 
     <div class="container">
-      <div class="page-header">
-        <h1><?= $header['main'] ?> <small><?= $header['sub'] ?></small></h1>
-      </div>
-      <ol class="breadcrumb">
-        <li><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-        <?php foreach ($breadcrumb as $key => $value) : ?>
-          <?php if (empty($value)) : ?>
-            <li class="active"><?= $key ?></li>
-          <?php else : ?>
-            <li><a href="<?= base_url($value) ?>"><?= $key ?></a></li>
-          <?php endif; ?>
-        <?php endforeach; ?>
-      </ol>
+      <?php if (!empty($header)) : ?>
+        <div class="page-header">
+          <h1><?= $header['main'] ?> <small><?= $header['sub'] ?></small></h1>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!empty($breadcrumb)) : ?>
+        <ol class="breadcrumb">
+          <li><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <?php foreach ($breadcrumb as $key => $value) : ?>
+            <?php if (empty($value)) : ?>
+              <li class="active"><?= $key ?></li>
+            <?php else : ?>
+              <li><a href="<?= base_url($value) ?>"><?= $key ?></a></li>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </ol>
+      <?php endif; ?>
 
       <?= $view ?>
         
@@ -104,12 +109,12 @@
     <script src="/resources/js/bootstrap.min.js"></script>
 
     <?php if (!empty($js) && is_string($js)) : ?>
-      <script type="text/javascript" src="/resources/js/<?= $js ?>.js"></script>
+      <script src="/resources/js/<?= $js ?>.js"></script>
     <?php endif; ?>
 
     <?php if (!empty($js) && is_array($js)) : ?>
       <?php foreach ($js as $link) : ?>
-        <script type="text/javascript" src="/resources/js/<?= $link ?>.js"></script>
+        <script src="/resources/js/<?= $link ?>.js"></script>
       <?php endforeach; ?>
     <?php endif; ?>
 

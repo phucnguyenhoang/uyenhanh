@@ -10,7 +10,12 @@
     <!-- Bootstrap -->
     <link href="/resources/css/bootstrap.min.css" rel="stylesheet">
 
-    <style type="text/css">
+    <style type="text/css">    
+      label.required::after {
+        content: "*";
+        color: #a94442;
+        margin-left: 3px;
+      }
       .btn-link {
         color: #a94442;
       }
@@ -37,12 +42,12 @@
                 <?= fMessage($flash['msg'], $flash['type']) ?>
               <?php endif; ?>
               <div class="form-group">
-                <label for="txtUserName"><?= lang('username') ?></label>
+                <label for="txtUserName" class="required"><?= lang('username') ?></label>
                 <input type="text" name="username" class="form-control" id="txtUserName" placeholder="<?= lang('username') ?>"  data-rule="required|maxLength:100">
               </div>
 
               <div class="form-group">
-                <label for="txtPassword"><?= lang('password') ?></label>
+                <label for="txtPassword" class="required"><?= lang('password') ?></label>
                 <input type="password" name="password" class="form-control" id="txtPassword" placeholder="<?= lang('password') ?>" data-rule="required|maxLength:100">
               </div>
             </div>

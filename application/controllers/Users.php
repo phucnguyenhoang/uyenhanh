@@ -5,6 +5,7 @@ class Users extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 
+		$this->auth->check(array('allowed' => array('login')));
 		$this->load->model('user');
 	}
 
@@ -26,6 +27,7 @@ class Users extends CI_Controller {
 				$this->session->set_flashdata('message', array('type' => 'danger', 'msg' => lang('login_failed')));
 			} else {
 				$this->auth->setUser($auth);
+				redirect('/');
 			}
 		}
 
@@ -37,6 +39,6 @@ class Users extends CI_Controller {
 
 	public function logout() {
 		$this->session->unset_userdata('auth');
-		redirect('/');
+		redirect('users/login');
 	}
 }

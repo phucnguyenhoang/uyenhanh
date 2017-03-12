@@ -295,7 +295,9 @@
 
         }, options );
 
-        GValidator.run(settings, this);
+        if (this) {
+            GValidator.run(settings, this);    
+        }        
 
         return this;
     };
