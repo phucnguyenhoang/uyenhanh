@@ -27,3 +27,26 @@ function toEnglish($str) {
   	$str = preg_replace("/(Đ)/", 'D', $str);
   	return $str;
 }
+
+function orderStatus($status) {
+  $txtStatus = array(
+    0 => 'Chưa thanh toán',
+    1 => 'Đã thanh toán',
+    3 => 'Hủy'
+  );
+
+  if (array_key_exists($status, $txtStatus)) return $txtStatus[$status];
+
+  return 'Không xác định';
+}
+
+function orderType($type) {
+  $txtType = array(
+    1 => 'Mua vào',
+    2 => 'Bán ra'
+  );
+
+  if (array_key_exists($type, $txtType)) return $txtType[$type];
+
+  return 'Không xác định';
+}

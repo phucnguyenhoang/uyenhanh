@@ -46,7 +46,7 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li><a href="#">Link</a></li>
+            <li class="<?= $this->uri->rsegment(1) == 'orders' ? 'active' : '' ?>"><a href="<?= base_url('orders') ?>"><?= lang('order') ?></a></li>
             <li class="dropdown <?= in_array($this->uri->rsegment(1), array('products', 'customers')) ? 'active' : '' ?>">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= lang('lists') ?> <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -102,6 +102,8 @@
       <?= $view ?>
         
     </div>
+
+    <div class="footer">copyright@phucnguyen 2017</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="/resources/js/jquery-2.1.4.min.js"></script>

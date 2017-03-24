@@ -1,3 +1,6 @@
+.container {
+	min-height: 500px;
+}
 .navbar {
     border-radius: 0 !important;
     margin-bottom: 0;
@@ -40,8 +43,57 @@
 .w80 {
 	width: 80px !important;
 }
+.w120 {
+	width: 120px !important;
+}
 label.required::after {
 	content: "*";
 	color: #a94442;
 	margin-left: 3px;
+}
+
+.footer {
+	width: 100%;
+	height: 100px;
+	background-color: #222222;
+	color: #cccccc;
+    text-align: center;
+    padding-top: 20px;
+    margin-top: 25px;
+    font-size: small;
+    font-style: italic;
+}
+
+div.datepicker-box {
+	width: 220px;
+}
+textarea {
+    resize: none;
+}
+
+.btn-collapse, .btn-collapse:active, .btn-collapse:hover, .btn-collapse:focus {
+	color: rgb(51, 51, 51);
+	text-decoration: none;
+}
+
+.loading {
+	background-image: url(/resources/images/loading.gif);
+    background-color: rgba(200,200,200,.5);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+.panel .loading {
+	width: calc(100% - 30px);
+    height: calc(100% - 45px);
+    margin-left: 15px;
+    margin-top: 44px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
 }

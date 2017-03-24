@@ -71,9 +71,12 @@ class Product extends CI_Model {
         return $this->db->affected_rows();
     }
 
-    public function all () {
+    public function all ($delete = false) {
         $this->db->select('*');
         $this->db->from($this->table);
+        if ($delete) {
+            $this->db->where('deleted_by IS NULL', null, true);
+        }
         $this->db->order_by('deleted_date, name');
         $query = $this->db->get();
 
@@ -88,6 +91,26 @@ class Product extends CI_Model {
         $query = $this->db->get();
 
         return $query->row();
+    }
+
+    public function autoComplate () {
+        $this->db->select('id, name');
+        $this->db->from($this->table);
+        $this->db->where('deleted_by IS NULL', null, true);
+        $this->db->order_by('name');
+        $query = $this->db->get();
+
+        return $query->result();
+    }
+
+    public function exist($id) {
+        $this->db->select('id');
+        $this->db->from($this->table);
+        $this->db->where('id', $id);
+        $this->db->where('deleted_by IS NULL', null, true);
+        $query = $this->db->get();
+
+        return $query->num_rows();
     }
 
 }

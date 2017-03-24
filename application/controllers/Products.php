@@ -122,4 +122,12 @@ class Products extends CI_Controller {
 
         redirect('products');
 	}
+
+	public function autocomplate() {
+		//if (!$this->input->is_ajax_request()) show_404();
+		header('Content-Type: application/json');
+		$products = $this->product->autoComplate();
+		
+		echo json_encode($products);
+	}
 }

@@ -47,15 +47,15 @@
 <div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog  modal-sm">
         <div class="modal-content">
-            <div class="modal-header">
-                <?= lang('confirm_delete_title') ?>
+            <div class="modal-header text-danger">
+                <strong class="panel-title"><?= lang('confirm_delete_title') ?></strong>
             </div>
             <div class="modal-body">
                 <?= lang('confirm_delete_msg') ?>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal"><?= lang('cancel') ?></button>
-                <a class="btn btn-danger btn-ok"><?= lang('delete') ?></a>
+                <a class="btn btn-danger btn-ok"><span class="glyphicon glyphicon-trash"></span> <?= lang('delete') ?></a>
             </div>
         </div>
     </div>
