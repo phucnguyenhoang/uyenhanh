@@ -40,13 +40,15 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-home"></span></a>
+          <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span></a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li class="<?= $this->uri->rsegment(1) == 'orders' ? 'active' : '' ?>"><a href="<?= base_url('orders') ?>"><?= lang('order') ?></a></li>
+            <li class="<?= $this->uri->rsegment(1) == 'quotations' ? 'active' : '' ?>"><a href="<?= base_url('quotations') ?>"><?= lang('quotation') ?></a></li>
+            <li class="<?= $this->uri->rsegment(1) == 'reports' ? 'active' : '' ?>"><a href="<?= base_url('reports') ?>"><?= lang('report') ?></a></li>
             <li class="dropdown <?= in_array($this->uri->rsegment(1), array('products', 'customers')) ? 'active' : '' ?>">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= lang('lists') ?> <span class="caret"></span></a>
               <ul class="dropdown-menu">

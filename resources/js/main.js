@@ -39,6 +39,10 @@ var App = {
 			$('#frmCustomerEdit').gValidator(self.message.rule);
 		}
 
+		if ($('#frmAddQuotation').length) {
+			$('#frmAddQuotation').gValidator(self.message.rule);
+		}
+
 		$('#confirmDelete').on('show.bs.modal', function(e) {
 			$(this).find('.cf-name').text($(e.relatedTarget).data('name'));
 		    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
@@ -63,7 +67,11 @@ var App = {
 		this._collapsePanel();
 		this._handleAddProduct();
 		this._handleEditProduct();
+		this._editQuotation();
+		this._handleAddProductToQuotation();
+		this._handleEditQuotationProduct();
 		this._sendEmail();
+		this._sendEmailReport();
 	},
 	_dateButtonClick: function() {
 		$('.btn-date').click(function() {
@@ -355,6 +363,173 @@ var App = {
 			});
 		});
 	},
+	_editQuotation: function() {
+		var self = this;
+
+		$('#btnSaveQuotation').click(function() {
+			var btn = $(this),
+				panQuotationInfo = $('#panQuotationInfo');
+
+			btn.prop('disabled', true);
+			$.ajax({
+				url: '/quotations/edit',
+				method: 'post',
+				data: {
+					id: btn.data('id'),
+					name: panQuotationInfo.find('#txtQuotationName').val(),
+					note: panQuotationInfo.find('#txtNote').val()
+				},
+				dataType: 'json',
+				error: function(err) {
+					panQuotationInfo.prepend(self._showError('danger', self.message.hasError));
+					btn.prop('disabled', false);
+				},
+				success: function(data) {
+					if (data.status) {
+						panQuotationInfo.prepend(self._showError('success', self.message.editSuccess));
+					} else {
+						panQuotationInfo.prepend(self._showError('danger', self.message.hasError));
+					}
+					btn.prop('disabled', false);
+				}
+			});
+		});
+	},
+	_handleAddProductToQuotation: function() {
+		var self = this,
+			panAddProductToQuotation = $('#panAddProductToQuotation');
+
+		panAddProductToQuotation.on('click', '#btnAddQuotation', function() {
+			var btn = $(this),
+				quotationId = btn.data('id'),
+				txtProduct = panAddProductToQuotation.find('#txtProduct'),
+				txtPrice = panAddProductToQuotation.find('#txtPrice'),
+				txtNote = panAddProductToQuotation.find('#txtProductNote'),
+				productId = txtProduct.typeahead('getActive'),
+				price = txtPrice.autoNumeric('getNumber'),
+				note = txtNote.val();
+
+			self._clearError(panAddProductToQuotation);
+			if (productId === undefined || txtProduct.val() == '') {
+				self._showFieldError(txtProduct, self.message.required);
+			}
+			if (price == 0) {
+				self._showFieldError(txtPrice, self.message.required);	
+			}
+			if (productId === undefined || price == 0) {
+				return false;
+			}
+			
+			panAddProductToQuotation.append('<div class="loading"></div>');
+			
+			$.ajax({
+				url: '/quotations/add-product',
+				type: 'post',
+				dataType: 'json',
+				data: {
+					'quotations_id': quotationId,
+					'products_id': productId.id,
+					'price': price,
+					'note': note
+				},
+				error: function(err) {
+					panAddProductToQuotation.prepend(self._showError('danger', self.message.hasError));
+					panAddProductToQuotation.find('.loading').remove();
+				},
+				success: function(data) {
+					panAddProductToQuotation.find('.loading').remove();
+					if (!data.error) {
+						$('#panQuotationHasProduct').html(data.body);
+						$('.pan-share-quotation-control').removeClass('hidden');
+						txtProduct.val('');
+						txtProduct.typeahead('destroy');
+						txtProduct.typeahead({
+						 	source: self.data,
+						    autoSelect: true,
+						    showHintOnFocus: 'all',
+						    fitToElement: true
+						});
+						txtPrice.val('');
+						txtNote.val('');
+					}
+				}
+			});
+		});
+	},
+	_handleEditQuotationProduct: function() {
+		var self = this,
+			modalEditQuotationProduct = $('#modalEditQuotationProduct'),
+			txtProduct = modalEditQuotationProduct.find('#txtAddProduct'),
+			txtPrice = modalEditQuotationProduct.find('#txtAddPrice'),
+			txtNote = modalEditQuotationProduct.find('#txtAddProductNote');
+
+		modalEditQuotationProduct.on('show.bs.modal', function(e) {
+			var id = $(e.relatedTarget).data('id'),
+				name = $(e.relatedTarget).data('name');
+
+			modalEditQuotationProduct.find('.modal-content').append('<div class="loading"></div>');
+			txtProduct.val(name);
+			txtPrice.val('');
+			txtNote.val('');
+
+			modalEditQuotationProduct.find('.btn-ok').data('id', id);
+
+			$.ajax({
+				url: '/quotations/view-product/' + id,
+				method: 'get',
+				dataType: 'json',
+				success: function(data) {
+					if (!data.error) {
+						txtPrice.autoNumeric('set', data.product.price);
+						txtNote.val(data.product.note);
+					}
+					modalEditQuotationProduct.find('.loading').remove();
+				}
+			});
+		});
+
+		modalEditQuotationProduct.on('click', '.btn-ok', function() {
+			var id = $(this).data('id'),
+				price = txtPrice.autoNumeric('getNumber'),
+				note = txtNote.val();
+
+			self._clearError(modalEditQuotationProduct);
+			if (price <= 0) {
+				self._showFieldError(txtPrice, self.message.required);
+				return false;
+			}
+
+			modalEditQuotationProduct.find('.modal-content').append('<div class="loading"></div>');
+			$.ajax({
+				url: '/quotations/edit-product/' + id,
+				method: 'post',
+				dataType: 'json',
+				data: {
+					quotationId: $('#hidQuotationId').val(),
+					price: price,
+					note: note
+				},
+				error: function(err) {
+					modalEditQuotationProduct.find('.modal-body').prepend(self._showError('danger', self.message.hasError));
+					modalEditQuotationProduct.find('.loading').remove();
+				},
+				success: function(data) {
+					if (!data.error) {
+						if (data.body != '') {
+							$('#panQuotationHasProduct').html(data.body);
+						}
+						modalEditQuotationProduct.find('.modal-body').prepend(self._showError('success', self.message.editSuccess));
+						setTimeout(function(){
+							modalEditQuotationProduct.modal('hide');
+						}, 1000);
+					} else {
+						modalEditQuotationProduct.find('.modal-body').prepend(self._showError('danger', self.message.hasError));
+					}
+					modalEditQuotationProduct.find('.loading').remove();
+				}
+			});
+		});
+	},
 	_sendEmail: function() {
 		var self = this,
 			modalSendEmail = $('#modalSendEmail');
@@ -364,7 +539,8 @@ var App = {
 				txtToEmail = modalSendEmail.find('#txtToEmail'),
 				txtReceverName = modalSendEmail.find('#txtReceverName'),
 				txtEmailContent = modalSendEmail.find('#txtEmailContent'),
-				orderId = btn.data('id'),
+				id = btn.data('id'),
+				type = btn.data('type'),
 				toEmail = txtToEmail.val(),
 				receverName = txtReceverName.val(),
 				content = txtEmailContent.val();
@@ -385,8 +561,8 @@ var App = {
 				method: 'post',
 				dataType: 'json',
 				data: {
-					type: 'dayOrder',
-					orderId: orderId,
+					type: type,
+					id: id,
 					toEmail: toEmail,
 					receverName: receverName,
 					content: content
@@ -397,14 +573,72 @@ var App = {
 					modalSendEmail.find('.loading').remove();
 				},
 				success: function(data) {
-					console.log(data);
 					if (data.error) {
 						modalSendEmail.find('.modal-body').prepend(self._showError('danger', self.message.hasError));
 					} else {
 						modalSendEmail.find('.modal-body').prepend(self._showError('success', self.message.sendEmailSuccess));
 						setTimeout(function(){
 							modalSendEmail.modal('hide');
-						}, 800);
+						}, 1000);
+					}
+					modalSendEmail.find('.loading').remove();
+				}
+			});
+		});
+	},
+	_sendEmailReport: function() {
+		var self = this,
+			modalSendEmail = $('#modalSendEmailReport');
+
+		modalSendEmail.on('click', '.btn-ok', function() {
+			var btn = $(this),
+				txtToEmail = modalSendEmail.find('#txtToEmail'),
+				txtReceverName = modalSendEmail.find('#txtReceverName'),
+				txtEmailContent = modalSendEmail.find('#txtEmailContent'),
+				fromDate = btn.data('from'),
+				toDate = btn.data('to'),
+				customerId = btn.data('customer'),
+				type = btn.data('type'),
+				toEmail = txtToEmail.val(),
+				receverName = txtReceverName.val(),
+				content = txtEmailContent.val();
+
+			self._clearError(modalSendEmail);
+			if (toEmail == '') {
+				self._showFieldError(txtToEmail, self.message.required);
+				return false;
+			}
+			if (!self._validateEmail(toEmail)) {
+				self._showFieldError(txtToEmail, self.message.emailInvalid);
+				return false;
+			}
+
+			modalSendEmail.find('.modal-content').append('<div class="loading"></div>');
+			$.ajax({
+				url: '/email',
+				method: 'post',
+				dataType: 'json',
+				data: {
+					type: type,
+					fromDate: fromDate,
+					toDate: toDate,
+					customerId: customerId,
+					toEmail: toEmail,
+					receverName: receverName,
+					content: content
+				},
+				error: function(err) {
+					modalSendEmail.find('.modal-body').prepend(self._showError('danger', self.message.hasError));
+					modalSendEmail.find('.loading').remove();
+				},
+				success: function(data) {
+					if (data.error) {
+						modalSendEmail.find('.modal-body').prepend(self._showError('danger', self.message.hasError));
+					} else {
+						modalSendEmail.find('.modal-body').prepend(self._showError('success', self.message.sendEmailSuccess));
+						setTimeout(function(){
+							modalSendEmail.modal('hide');
+						}, 1000);
 					}
 					modalSendEmail.find('.loading').remove();
 				}

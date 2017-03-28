@@ -86,7 +86,7 @@
         <div class="modal-dialog  modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <?= lang('create_order') ?>
+                    <strong class="panel-title"><?= lang('create_order') ?></strong>
                 </div>
                 <div class="modal-body">                      
                     <div class="form-group">

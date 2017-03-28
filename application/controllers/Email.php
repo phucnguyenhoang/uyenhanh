@@ -11,7 +11,7 @@ class Email extends CI_Controller {
 		parent::__construct();
 
 		$this->auth->check();
-		$this->load->model(array('order'));
+		$this->load->model(array('order', 'quotation', 'customer', 'report'));
 		$this->load->library('pdf');
 	}
 
@@ -33,7 +33,7 @@ class Email extends CI_Controller {
 
 		switch ($type) {
 			case 'dayOrder':
-				$orderId = $this->input->post('orderId');
+				$orderId = $this->input->post('id');
 				$order = $this->order->get($orderId);
 				if (empty($order)) {
 					echo json_encode($res);
@@ -93,7 +93,135 @@ class Email extends CI_Controller {
 				echo json_encode($res);
             	exit();
 				break;
-			
+
+			case 'quotation':
+				$quotationId = $this->input->post('id');
+				$quotation = $this->quotation->get($quotationId);
+				if (empty($quotation)) {
+					echo json_encode($res);
+            		exit();
+				}
+
+				$receverName = $this->input->post('receverName');
+				if (empty($receverName)) {
+					$receverName = substr($toEmail, 0, strpos($toEmail, '@'));
+				}
+				$quotationDate = $quotation->created_date;
+
+				// begin make pdf file
+				$pdfFile = uniqid().'.pdf';
+				$pdfFilePath = $this->pdfDir.$pdfFile;
+				$pdfData = array(
+					'quotation' => $quotation,
+					'products' => $this->quotation->getProducts($quotationId)
+				);
+				
+				$html = $this->load->view('exports/quotation', $pdfData, true);
+				$header = array(
+					'title' => 'Bảng báo giá',
+					'sub' => 'Ngày: '.date('d/m/Y', strtotime($quotationDate))
+				);
+				$this->pdf->render($header, $html, $pdfFilePath, 'F');
+				if (!file_exists($pdfFilePath)) {
+					echo json_encode($res);
+            		exit();
+				}
+				// end make pdf file
+
+				// make email content
+				$viewData = array(
+					'receverName' => $receverName,
+					'quotationDate' => date('d/m/Y', strtotime($quotationDate)),
+					'content' => $this->input->post('content')
+				);
+
+				$emailTitle = 'Bảng báo giá ngày: '.date('d/m/Y', strtotime($quotationDate));
+				$emailContent = $this->load->view('email/quotation', $viewData, true);
+				// send email
+				$this->load->library('email');
+
+				$this->email->from($this->fromEmail, $this->emailName);
+				$this->email->to($toEmail);
+
+				$this->email->subject($emailTitle);
+				$this->email->attach($pdfFilePath, 'attachment', 'bang-bao-gia-'.date('dmY', strtotime($quotationDate)).'.pdf');
+				$this->email->message($emailContent);
+
+				if ($this->email->send()) {
+					$this->email->print_debugger(array('headers'));
+					$res['error'] = false;
+				}
+
+				echo json_encode($res);
+            	exit();
+				break;
+
+			case 'report':
+				$fromDate = $this->input->post('fromDate');
+				$toDate = $this->input->post('toDate');
+				$customerId = $this->input->post('customerId');
+				$customer = $this->customer->get($customerId);
+				if (empty($customer)) {
+					echo json_encode($res);
+            		exit();
+				}
+
+				$receverName = $this->input->post('receverName');
+				if (empty($receverName)) {
+					$receverName = substr($toEmail, 0, strpos($toEmail, '@'));
+				}
+
+				// begin make pdf file
+				$pdfFile = uniqid().'.pdf';
+				$pdfFilePath = $this->pdfDir.$pdfFile;
+				$pdfData = array(
+					'fromDate' => $fromDate,
+					'toDate' => $toDate,
+					'customer' => $customer,
+					'products' => $this->report->getReport($fromDate, $toDate, $customerId)
+				);
+				
+				$html = $this->load->view('exports/report', $pdfData, true);
+				$header = array(
+					'title' => 'Đơn hàng từ ngày '.date('d/m/Y', strtotime($fromDate)).' đến ngày '.date('d/m/Y', strtotime($toDate)),
+					'sub' => 'Đối tác: '.$customer->name
+				);
+				$this->pdf->render($header, $html, $pdfFilePath, 'F');
+				if (!file_exists($pdfFilePath)) {
+					echo json_encode($res);
+            		exit();
+				}
+				// end make pdf file
+
+				// make email content
+				$viewData = array(
+					'receverName' => $receverName,
+					'fromDate' => date('d/m/Y', strtotime($fromDate)),
+					'toDate' => date('d/m/Y', strtotime($toDate)),
+					'content' => $this->input->post('content')
+				);
+
+				$emailTitle = 'Đơn hàng từ ngày '.date('d/m/Y', strtotime($fromDate)).' đến ngày '.date('d/m/Y', strtotime($toDate));
+				$emailContent = $this->load->view('email/report', $viewData, true);
+				// send email
+				$this->load->library('email');
+
+				$this->email->from($this->fromEmail, $this->emailName);
+				$this->email->to($toEmail);
+
+				$this->email->subject($emailTitle);
+				$this->email->attach($pdfFilePath, 'attachment', 'don-hang-tu-ngay-'.date('dmY', strtotime($fromDate)).'-den-'.date('dmY', strtotime($toDate)).'.pdf');
+				$this->email->message($emailContent);
+
+				if ($this->email->send()) {
+					$this->email->print_debugger(array('headers'));
+					$res['error'] = false;
+				}
+
+				echo json_encode($res);
+            	exit();
+				break;
+
 			default:
 				show_404();
 				break;

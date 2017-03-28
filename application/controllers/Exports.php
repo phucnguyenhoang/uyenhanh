@@ -9,7 +9,7 @@ class Exports extends CI_Controller {
 		parent::__construct();
 
 		$this->auth->check();
-		$this->load->model(array('order'));
+		$this->load->model(array('order', 'quotation', 'customer', 'report'));
 		$this->load->library('pdf');
 	}
 
@@ -37,12 +37,52 @@ class Exports extends CI_Controller {
 				break;
 			
 			case 'quotation':
-				var_dump('quotation');
+				$quotationId = $this->input->get('id');
+				$fileName = $this->input->get('file');
+
+				$quotation = $this->quotation->get($quotationId);
+				if (empty($quotation)) show_404();
+
+				$viewData = array(
+					'quotation' => $quotation,
+					'products' => $this->quotation->getProducts($quotationId)
+				);
+				
+				$html = $this->load->view('exports/quotation', $viewData, true);
+				$header = array(
+					'title' => 'Bảng báo giá',
+					'sub' => 'Ngày: '.date('d/m/Y', strtotime($quotation->created_date))
+				);
+				$this->pdf->render($header, $html, $fileName);
 				break;
+
+			case 'report':
+				$fromDate = $this->input->get('fromDate');
+				$toDate = $this->input->get('toDate');
+				$customerId = $this->input->get('customer');
+				$fileName = $this->input->get('fileName');
+				$customer = $this->customer->get($customerId);
+
+				if (empty($customer)) show_404();
+
+				$viewData = array(
+					'customer' => $customer,
+					'fromDate' => $fromDate,
+					'toDate' => $toDate,
+					'products' => $this->report->getReport($fromDate, $toDate, $customerId)
+				);
+				
+				$html = $this->load->view('exports/report', $viewData, true);
+				$header = array(
+					'title' => 'Đơn hàng từ ngày '.date('d/m/Y', strtotime($fromDate)).' đến ngày '.date('d/m/Y', strtotime($toDate)),
+					'sub' => 'Đối tác: '.$customer->name
+				);
+				$this->pdf->render($header, $html, $fileName);
+				break;
+
 			default:
 				show_404();
 				break;
 		}
-		//$this->pdf->render($header, $view, $this->pdfDir.$fileName, 'F');
 	}
 }

@@ -9,6 +9,7 @@ $lang['login_failed']			= 'Đăng nhập không thành công';
 $lang['logout']					= 'Đăng xuất';
 $lang['change_password']		= 'Đổi mật khẩu';
 $lang['change_avatar']			= 'Đổi hình đại diện';
+$lang['created_date']			= 'Ngày tạo';
 
 $lang['save']					= 'Lưu';
 $lang['cancel']					= 'Hủy';
@@ -67,4 +68,18 @@ $lang['content']				= 'Nội dung';
 $lang['send']					= 'Gửi';
 $lang['email_incorrect']		= 'Email không hợp lệ.';
 
+$lang['quotation']				= 'Báo giá';
+$lang['create_quotation']		= 'Tạo báo giá';
+$lang['quotation_info']			= 'Thông tin bảng báo giá';
+$lang['add_product_to_quotation'] = 'Thêm sản phẩm vào báo giá';
+$lang['quotation_empty']		= 'Chưa có báo giá nào.';
+$lang['quotation_detail']		= 'Chi tiết báo giá';
+
+$lang['report']					= 'Báo cáo';
+$lang['option']					= 'Tùy chọn';
+$lang['view']					= 'Xem';
+$lang['from_date']				= 'Từ ngày';
+$lang['to_date']				= 'Đến ngày';
+$lang['all']					= 'Tất cả';
+$lang['day']					= 'Ngày';
 
